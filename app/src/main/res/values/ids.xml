@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Google Play game services IDs.
+Save this file as res/values/games-ids.xml in your project.
+-->
+<resources>
+    <!-- app_id -->
+    <string name="app_id" translatable="false">935200666451</string>
+    <!-- package_name -->
+    <string name="package_name" translatable="false">com.nightowldevelopers.richierich</string>
+    <!-- achievement Donation Score 100 -->
+    <string name="achievement_donation_score_100" translatable="false">CgkI0-a28psbEAIQAA</string>
+    <!-- achievement Donation Score 500 -->
+    <string name="achievement_donation_score_500" translatable="false">CgkI0-a28psbEAIQAQ</string>
+    <!-- achievement Donation Score 1000 -->
+    <string name="achievement_donation_score_1000" translatable="false">CgkI0-a28psbEAIQAg</string>
+    <!-- achievement Donation Score 5000 -->
+    <string name="achievement_donation_score_5000" translatable="false">CgkI0-a28psbEAIQAw</string>
+    <!-- achievement Donation Score 50,000 -->
+    <string name="achievement_donation_score_50000" translatable="false">CgkI0-a28psbEAIQBA</string>
+    <!-- achievement Donation Score 1,00,000 -->
+    <string name="achievement_donation_score_100000" translatable="false">CgkI0-a28psbEAIQBw</string>
+    <!-- leaderboard Richness Rank -->
+    <string name="leaderboard_richness_rank" translatable="false">CgkI0-a28psbEAIQCQ</string>
+</resources>

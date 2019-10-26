@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "935200666451",
+    "firebase_url": "https://richierich-99498592.firebaseio.com",
+    "project_id": "richierich-99498592",
+    "storage_bucket": "richierich-99498592.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935200666451:android:6a670013326b4909a467a6",
+        "android_client_info": {
+          "package_name": "com.nightowldevelopers.richierich"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935200666451-6pnapd4rglfsve1psfoqa1obkjb5644g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nightowldevelopers.richierich",
+            "certificate_hash": "bfecc820a7c21a1374d77c525a9d10d21499aead"
+          }
+        },
+        {
+          "client_id": "935200666451-dsdhaqh3bsnm6oi6099oju3a4bvsklak.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nightowldevelopers.richierich",
+            "certificate_hash": "13d839a53d34eb5c3b6b81af86d0e3fd39d48513"
+          }
+        },
+        {
+          "client_id": "935200666451-7af93dk5ur41b2sf103gvhjcm3sjhdm9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6BP7zUf7SpYc63tShUpNsCRoj0OdRp2Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935200666451-7af93dk5ur41b2sf103gvhjcm3sjhdm9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
