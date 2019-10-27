@@ -350,6 +350,9 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
         Toast.makeText(
             this, "onPurchasesUpdated:$responseCode", Toast.LENGTH_LONG
         )
+        if (responseCode == 7){
+            allowMultiplePurchases(purchases)
+        }
         allowMultiplePurchases(purchases)
         if (responseCode == 0){
             var purchases_data=purchases.toString().split(',',limit = 3).last().split(',').first().split(':').last().replace('"',' ').trim()
@@ -365,18 +368,18 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
                         if (leaderboardScoreAnnotatedData.get() != null) {
                             score = leaderboardScoreAnnotatedData.get()!!.getRawScore()
                             Log.d("DOG", "LeaderBoard: " + score)
-                            updateRank(score,purchases_data)
+                            updateRank(score,purchases_data,purchases)
                         } else {
                             Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
                                 .submitScore(getString(R.string.leaderboard_richness_rank), 1)
                             Log.d("DOG", "LeaderBoard: .get() is null")
-                            updateRank(score,purchases_data)
+                            updateRank(score,purchases_data,purchases)
                         }
                     } else {
                         Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
                             .submitScore(getString(R.string.leaderboard_richness_rank), 1)
                         Log.d("DOG", "LeaderBoard: " + score)
-                        updateRank(score,purchases_data)
+                        updateRank(score,purchases_data,purchases)
                     }
                 }
 
@@ -387,12 +390,13 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
         else {
             //loadProducts.setText("Payment Failed!")
         }
-
+        allowMultiplePurchases(purchases)
     }
 
-    private fun updateRank(score: Long, purchasesData: String) {
+    private fun updateRank(score: Long, purchasesData: String,purchases: MutableList<Purchase>?) {
         progressBar.visibility=View.VISIBLE
-        //Toast.makeText(this,score.toString()+""+purchasesData,Toast.LENGTH_LONG)
+        Toast.makeText(this,score.toString()+""+purchasesData,Toast.LENGTH_LONG)
+        Log.d("DOG",score.toString()+""+purchasesData)
         if(purchasesData=="test_50"){
             Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
                 .submitScore(getString(R.string.leaderboard_richness_rank), score+50)
@@ -446,6 +450,7 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
 
         }
         progressBar.visibility=View.GONE
+        allowMultiplePurchases(purchases)
 
     }
 
