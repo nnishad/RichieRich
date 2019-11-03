@@ -1,12 +1,8 @@
 package com.nightowldevelopers.richierich
 
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -17,7 +13,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.games.AnnotatedData
 import com.google.android.gms.games.Games
+import com.google.android.gms.games.leaderboard.LeaderboardScore
 import com.google.android.gms.games.leaderboard.LeaderboardVariant
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -25,14 +23,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.activity_google.*
 import kotlinx.android.synthetic.main.activity_main.products
-import com.google.android.gms.common.api.Result
-import com.google.android.gms.games.AnnotatedData
-import com.google.android.gms.games.leaderboard.LeaderboardScore
 
-
-/**
- * Demonstrate Firebase Authentication using a Google ID Token.
- */
 class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListener {
 
     private lateinit var billingClient: BillingClient
@@ -46,6 +37,7 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
 
 
     private lateinit var googleSignInClient: GoogleSignInClient
+    var newScore = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,42 +54,6 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
 
         achievement.setOnClickListener { showAchievements() }
         leaderboard.setOnClickListener { showLeaderboard() }
-
-
-        /*rateApp.setOnClickListener {
-            Toast.makeText(
-                this@MainActivity,
-                "Give 5-star Rating \n& Check your Achievement",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            val appPackageName = packageName // getPackageName() from Context or Activity object
-            try {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=$appPackageName")
-                    )
-                )
-                Games.getAchievementsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                    .unlock(getString(R.string.achievement_rate_on_playstore))
-                Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                    .submitScore(getString(R.string.leaderboard_leaderboard), 150000)
-            } catch (anfe: ActivityNotFoundException) {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-                    )
-                )
-                Games.getAchievementsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                    .unlock(getString(R.string.achievement_rate_on_playstore))
-                Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                    .submitScore(getString(R.string.leaderboard_leaderboard), 150000)
-            }
-
-        }
-        */
 
 
         // [START config_signin]
@@ -224,7 +180,7 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
-           // status.text = getString(R.string.google_status_fmt, user.email)
+            // status.text = getString(R.string.google_status_fmt, user.email)
             //detail.text = getString(R.string.firebase_status_fmt, user.uid)
             onLoadProductsClicked()
             signInButton.visibility = View.GONE
@@ -278,6 +234,7 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
             override fun onBillingSetupFinished(@BillingClient.BillingResponse billingResponseCode: Int) {
                 if (billingResponseCode == BillingClient.BillingResponse.OK) {
                     println("BILLING | startConnection | RESULT OK")
+                    clearHistory()
                 } else {
                     println("BILLING | startConnection | RESULT: $billingResponseCode")
                 }
@@ -299,6 +256,7 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
             billingClient.querySkuDetailsAsync(params) { responseCode, skuDetailsList ->
                 if (responseCode == BillingClient.BillingResponse.OK) {
                     println("querySkuDetailsAsync, responseCode: $responseCode")
+                    clearHistory()
                     initProductAdapter(skuDetailsList)
                 } else {
                     println("Can't querySkuDetailsAsync, responseCode: $responseCode")
@@ -350,11 +308,9 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
         Toast.makeText(
             this, "onPurchasesUpdated:$responseCode", Toast.LENGTH_LONG
         )
-        if (responseCode == 7){
-            allowMultiplePurchases(purchases)
-        }
         allowMultiplePurchases(purchases)
         if (responseCode == 0){
+            clearHistory()
             var purchases_data=purchases.toString().split(',',limit = 3).last().split(',').first().split(':').last().replace('"',' ').trim()
             Log.d("DOG",purchases_data)
             Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
@@ -366,20 +322,20 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
                     var score = 0L
                     if (leaderboardScoreAnnotatedData != null) {
                         if (leaderboardScoreAnnotatedData.get() != null) {
-                            score = leaderboardScoreAnnotatedData.get()!!.getRawScore()
+                            score = leaderboardScoreAnnotatedData.get()!!.rawScore
                             Log.d("DOG", "LeaderBoard: " + score)
-                            updateRank(score,purchases_data,purchases)
+                            updateRank(score, purchases_data)
                         } else {
                             Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
                                 .submitScore(getString(R.string.leaderboard_richness_rank), 1)
                             Log.d("DOG", "LeaderBoard: .get() is null")
-                            updateRank(score,purchases_data,purchases)
+                            updateRank(1, purchases_data)
                         }
                     } else {
                         Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
                             .submitScore(getString(R.string.leaderboard_richness_rank), 1)
-                        Log.d("DOG", "LeaderBoard: " + score)
-                        updateRank(score,purchases_data,purchases)
+                        Log.d("DOG", "LeaderBoard: Data not found")
+                        updateRank(1, purchases_data)
                     }
                 }
 
@@ -390,32 +346,26 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
         else {
             //loadProducts.setText("Payment Failed!")
         }
-        allowMultiplePurchases(purchases)
+
     }
 
-    private fun updateRank(score: Long, purchasesData: String,purchases: MutableList<Purchase>?) {
+    private fun updateRank(score: Long, purchasesData: String) {
         progressBar.visibility=View.VISIBLE
-        Toast.makeText(this,score.toString()+""+purchasesData,Toast.LENGTH_LONG)
-        Log.d("DOG",score.toString()+""+purchasesData)
+        //Toast.makeText(this,score.toString()+""+purchasesData,Toast.LENGTH_LONG)
         if(purchasesData=="test_50"){
-            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                .submitScore(getString(R.string.leaderboard_richness_rank), score+50)
+            setScore(score, 50)
         }
         if(purchasesData=="test_100"){
-            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                .submitScore(getString(R.string.leaderboard_richness_rank), score+100)
+            setScore(score, 100)
         }
         if(purchasesData=="test_500"){
-            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                .submitScore(getString(R.string.leaderboard_richness_rank), score+500)
+            setScore(score, 500)
         }
         if(purchasesData=="test_1000"){
-            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                .submitScore(getString(R.string.leaderboard_richness_rank), score+1000)
+            setScore(score, 1000)
         }
         if(purchasesData=="test_5000"){
-            Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
-                .submitScore(getString(R.string.leaderboard_richness_rank), score+5000)
+            setScore(score, 5000)
         }
 
         if(score>=100){
@@ -450,9 +400,43 @@ class MainActivity : BaseActivity(), PurchasesUpdatedListener, View.OnClickListe
 
         }
         progressBar.visibility=View.GONE
-        allowMultiplePurchases(purchases)
 
     }
+
+    private fun setScore(score: Long, i: Int) {
+        var prev = score
+        Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
+            .submitScore(getString(R.string.leaderboard_richness_rank), score + i)
+        var new = getScore()
+        Log.d("DOG", "LeaderBoard: " + new + "score" + prev)
+
+
+    }
+
+    private fun getScore(): Long {
+        Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)!!)
+            .loadCurrentPlayerLeaderboardScore(
+                getString(R.string.leaderboard_richness_rank),
+                LeaderboardVariant.TIME_SPAN_ALL_TIME,
+                LeaderboardVariant.COLLECTION_PUBLIC
+            )
+            .addOnSuccessListener { leaderboardScoreAnnotatedData: AnnotatedData<LeaderboardScore>? ->
+
+                if (leaderboardScoreAnnotatedData != null) {
+                    if (leaderboardScoreAnnotatedData.get() != null) {
+                        newScore = leaderboardScoreAnnotatedData.get()!!.rawScore
+                        Log.d("DOG", "LeaderBoard: " + newScore)
+                    } else {
+                        Log.d("DOG", "LeaderBoard: .get() is null")
+                    }
+                } else {
+                    Log.d("DOG", "LeaderBoard: Not found")
+                }
+            }
+        Log.d("DOG", "LeaderBoard: " + newScore)
+        return newScore
+    }
+
 
     private fun allowMultiplePurchases(purchases: MutableList<Purchase>?) {
         val purchase = purchases?.first()

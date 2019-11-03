@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "935200666451-9ivuujk5hgu14cukan3ccqcgfrf5oer5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nightowldevelopers.richierich",
+            "certificate_hash": "75b4fd31c3293ed2e33964f9470b137090ea4072"
+          }
+        },
+        {
           "client_id": "935200666451-6pnapd4rglfsve1psfoqa1obkjb5644g.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
